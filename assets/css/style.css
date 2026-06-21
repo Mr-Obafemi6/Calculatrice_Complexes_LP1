@@ -1,0 +1,206 @@
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  min-height:100vh;
+  background:#1C1C1E;
+  font-family:'Outfit',sans-serif;
+}
+
+.page-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+
+/* ── EN-TÊTE ── */
+.top-header{
+  background:#161618;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.header-badge{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(160deg,#16a34a,#0f7a38);
+  color:#0a1a0e;font-weight:700;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;
+}
+.header-title{ color:#fff; font-size:14px; font-weight:600; }
+.header-sub{ color:rgba(255,255,255,0.4); font-size:11px; }
+
+/* ── CALCULATOR BODY (identique au style validé) ── */
+.calc{
+  width:380px;
+  background:linear-gradient(160deg,#2C2C2E 0%,#1C1C1E 100%);
+  border-radius:28px;
+  padding:20px;
+  box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.07),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* BRAND */
+.brand{display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;}
+.brand-name{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+.brand-model{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,0.2);}
+
+/* SCREEN */
+.screen{
+  background:#0D1F12;border-radius:14px;
+  padding:16px 18px 14px;margin-bottom:18px;
+  border:1px solid rgba(0,0,0,0.5);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.6),0 1px 0 rgba(255,255,255,0.05);
+  min-height:120px;position:relative;overflow:hidden;
+}
+.screen::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+  pointer-events:none;border-radius:14px;
+}
+.sc-mode{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#4ade80;opacity:0.6;text-transform:uppercase;margin-bottom:6px;}
+.sc-expr{font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(74,222,128,0.45);min-height:16px;margin-bottom:4px;}
+.sc-main{font-family:'Share Tech Mono',monospace;font-size:26px;color:#4ade80;letter-spacing:0.02em;word-break:break-all;line-height:1.2;text-shadow:0 0 20px rgba(74,222,128,0.35);}
+.sc-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(74,222,128,0.5);margin-top:4px;}
+.sc-err{color:#f87171;text-shadow:0 0 20px rgba(248,113,113,0.4);}
+.cursor{display:inline-block;width:2px;height:20px;background:#4ade80;margin-left:2px;vertical-align:middle;animation:blk 1s step-end infinite;}
+@keyframes blk{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Vues multiples de l'écran (calcul / formules / repère) ── */
+.sc-view{ animation:fadein .18s ease; }
+.sc-view-hidden{ display:none; }
+@keyframes fadein{ from{opacity:0} to{opacity:1} }
+
+.sc-formules{ max-height:150px; overflow-y:auto; padding-right:4px; }
+.sf-row{
+  display:flex; justify-content:space-between; gap:10px;
+  padding:5px 0; border-bottom:1px solid rgba(74,222,128,0.08);
+  font-family:'Share Tech Mono',monospace;
+}
+.sf-row:last-child{ border-bottom:none; }
+.sf-k{ font-size:11px; color:#4ade80; white-space:nowrap; }
+.sf-v{ font-size:10px; color:rgba(74,222,128,0.55); text-align:right; }
+
+/* ── Vue Historique (même structure que Formules/Repère) ── */
+.hist-inner{ max-height:150px; overflow-y:auto; padding-right:4px; }
+.hi{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid rgba(74,222,128,0.08);font-family:'Share Tech Mono',monospace;font-size:11px;}
+.hi:last-child{border-bottom:none;}
+.h-op{color:rgba(74,222,128,0.45);flex:1;}
+.h-res{color:#4ade80;}
+.h-empty{color:rgba(255,255,255,0.2);font-size:12px;text-align:center;padding:10px;font-family:'Share Tech Mono',monospace;}
+
+.hist-clear-btn{
+  border:none; background:rgba(248,113,113,0.08);
+  color:rgba(248,113,113,0.7);
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:0.08em; text-transform:uppercase;
+  padding:4px 10px; border-radius:6px; cursor:pointer;
+  transition:all .15s;
+}
+.hist-clear-btn:hover{ background:rgba(248,113,113,0.18); color:#f87171; }
+
+#viewRepere{ display:flex; flex-direction:column; align-items:center; }
+#viewRepere.sc-view-hidden{ display:none; }
+#plane{
+  width:100%; max-width:300px; margin-top:6px;
+  background:rgba(0,0,0,0.2); border-radius:8px;
+}
+
+.sc-back-btn{
+  display:none; width:100%; margin-top:-8px; margin-bottom:14px;
+  padding:6px; border:none; border-radius:8px;
+  background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.4);
+  font-family:'Outfit',sans-serif; font-size:11px; cursor:pointer;
+  transition:all .15s;
+}
+.sc-back-btn:hover{ background:rgba(255,255,255,0.1); color:#fff; }
+.sc-back-btn.show{ display:block; }
+
+/* ── Sélecteur Z₁ / Z₂ (mode binaire) ── */
+.z-selector{
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:10px; padding:8px 12px;
+  background:rgba(96,165,250,0.08);
+  border-radius:10px; border:1px solid rgba(96,165,250,0.15);
+}
+.z-sel-btn{
+  padding:5px 16px; border:none; border-radius:8px;
+  background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4);
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .12s; flex-shrink:0;
+}
+.z-sel-btn:hover{ background:rgba(96,165,250,0.2); color:#60a5fa; }
+.z-sel-btn.on{ background:#60a5fa; color:#0a1530; }
+.z-sel-label{
+  flex:1; text-align:center;
+  font-family:'Share Tech Mono',monospace; font-size:10px;
+  color:rgba(96,165,250,0.6); letter-spacing:0.05em;
+}
+
+/* MODE BAR — grille unique à 5 colonnes, une seule ligne */
+.mode-bar{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+  margin-bottom:14px;
+}
+.mbt{
+  padding:8px 2px;border:none;border-radius:8px;
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);
+  font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;letter-spacing:0.01em;
+  white-space:nowrap;
+}
+.mbt:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);}
+.mbt.on{background:#4ade80;color:#0a1a0e;font-weight:600;}
+.mbt-alt{ background:rgba(96,165,250,0.1); color:rgba(96,165,250,0.7); }
+.mbt-alt:hover{ background:rgba(96,165,250,0.2); color:#60a5fa; }
+.mbt-alt.on{ background:#60a5fa; color:#0a1530; font-weight:600; }
+
+/* KEYPAD */
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.key{
+  position:relative;border:none;border-radius:12px;
+  cursor:pointer;height:56px;padding:0;
+  transition:all 0.08s;user-select:none;overflow:hidden;
+}
+.key:active{transform:translateY(2px) scale(0.97)!important;}
+.kf{position:absolute;inset:0;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.kl{font-size:16px;font-family:'Outfit',sans-serif;font-weight:500;line-height:1;}
+.ks{font-size:8.5px;opacity:0.55;letter-spacing:0.04em;font-weight:400;}
+
+.key-num{background:linear-gradient(180deg,#3A3A3C,#2C2C2E);box-shadow:0 4px 0 #111,0 1px 0 rgba(255,255,255,0.08);color:#fff;}
+.key-num:hover{background:linear-gradient(180deg,#48484A,#3A3A3C);}
+.key-num:active{box-shadow:0 1px 0 #111;}
+
+.key-op{background:linear-gradient(180deg,#5C5C5E,#48484A);box-shadow:0 4px 0 #222,0 1px 0 rgba(255,255,255,0.1);color:#fff;}
+.key-op:hover{background:linear-gradient(180deg,#6E6E70,#5C5C5E);}
+.key-op:active{box-shadow:0 1px 0 #222;}
+
+.key-fn{background:linear-gradient(180deg,#2A3D2E,#1E2E21);box-shadow:0 4px 0 #0a1a0e,0 1px 0 rgba(74,222,128,0.15);color:#4ade80;font-size:13px;}
+.key-fn:hover{background:linear-gradient(180deg,#344D38,#2A3D2E);}
+.key-fn:active{box-shadow:0 1px 0 #0a1a0e;}
+
+.key-blue{background:linear-gradient(180deg,#1a3a5c,#102845);box-shadow:0 4px 0 #071525,0 1px 0 rgba(96,165,250,0.2);color:#60a5fa;}
+.key-blue:hover{background:linear-gradient(180deg,#1e4470,#1a3a5c);}
+.key-blue:active{box-shadow:0 1px 0 #071525;}
+
+.key-red{background:linear-gradient(180deg,#991b1b,#7f1d1d);box-shadow:0 4px 0 #4c0f0f,0 1px 0 rgba(255,255,255,0.1);color:#fca5a5;}
+.key-red:hover{background:linear-gradient(180deg,#b91c1c,#991b1b);}
+.key-red:active{box-shadow:0 1px 0 #4c0f0f;}
+
+.key-eq{background:linear-gradient(180deg,#16a34a,#0f7a38);box-shadow:0 4px 0 #064220,0 1px 0 rgba(255,255,255,0.15);color:#fff;grid-column:span 2;}
+.key-eq .kl{font-size:22px;}
+.key-eq:hover{background:linear-gradient(180deg,#1dbd57,#16a34a);}
+.key-eq:active{box-shadow:0 1px 0 #064220;}
+
+/* (le panneau "Saisie directe" avec <input> a été supprimé :
+   toute saisie passe désormais par le pavé numérique et le clic
+   sur le résultat affiché, voir .sc-main ci-dessous) */
+.sc-main{ cursor:pointer; }
+.sc-main:hover{ text-shadow:0 0 14px rgba(74,222,128,0.7); }
+
+/* (l'ancien panneau toggle .hist a été remplacé par la vue d'écran
+   #viewHist, voir règles .hist-inner / .hi plus haut) */
+
+/* ── FOOTER ── */
+.footer-bar{
+  text-align:center; padding:14px;
+  color:rgba(255,255,255,0.25); font-size:11px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+
+/* ── RESPONSIVE ── */
