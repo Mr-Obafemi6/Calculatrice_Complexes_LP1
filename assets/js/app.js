@@ -18,6 +18,12 @@ let touched = false;
    on peut le retaper chiffre par chiffre comme une nouvelle valeur. */
 let editingResult = false;
 
+/* ── Mode saisie exposant (pour Zⁿ) ──────────────────────────────────
+   Déclarées ici, en haut du fichier, avant toute fonction qui les
+   utilise — pas seulement à la fin — pour éviter toute ambiguïté. */
+let waitingForExp = false;  // on attend la saisie de n au pavé
+let expStr        = '';     // chaîne de l'exposant en cours de saisie
+
 /* État interne des deux nombres complexes — remplace les anciens
    champs <input id="ia1">, etc. Stockés comme chaînes pour permettre
    une saisie progressive ("-", "3.", "3.5"...). */
@@ -62,6 +68,7 @@ function showZ(z, expr) {
     editingResult = false;
     scr(fz(z), fp(z), expr);
     addHist(expr, fz(z));
+    if (typeof drawPlane === 'function') drawPlane(z1(), z3);
 }
 
 /* ── Modes ── */
@@ -83,6 +90,8 @@ function setMode(m, btn) {
     curOp = null;
     touched = false;
     editingResult = false;
+    waitingForExp = false;
+    expStr = '';
     updateZIndicator();
 }
 
@@ -91,6 +100,7 @@ function setMode(m, btn) {
    En mode Unaire : cible toujours Z₁.
 ────────────────────────────────────────────────────────────── */
 function kRe() {
+    if (waitingForExp) return; // pas de Re/Im pendant la saisie d'un exposant
     if (mode !== 'b') activeZ = 1;
     activePart = 're';
     editingResult = false;
@@ -99,6 +109,7 @@ function kRe() {
 }
 
 function kIm() {
+    if (waitingForExp) return;
     if (mode !== 'b') activeZ = 1;
     activePart = 'im';
     editingResult = false;
@@ -108,6 +119,7 @@ function kIm() {
 
 /* ── Boutons Z1 / Z2 (mode Binaire) ── */
 function selectZ(n, btn) {
+    if (waitingForExp) return;
     activeZ = n;
     editingResult = false;
     document.querySelectorAll('.z-sel-btn').forEach(b => b.classList.remove('on'));
@@ -120,8 +132,11 @@ function selectZ(n, btn) {
    Permet de reprendre la valeur affichée et de la modifier
    chiffre par chiffre, sans aucun champ de saisie externe.
    Ne fait rien si on est déjà en train de saisir Z1/Z2 (sinon
-   ça interromprait la frappe en cours). ────────────────────── */
+   ça interromprait la frappe en cours), ni pendant la saisie
+   d'un exposant. ────────────────────────────────────────────── */
 function onScreenClick() {
+    if (waitingForExp) return;
+
     // Si un résultat Z3 existe et qu'on n'est pas déjà en pleine saisie,
     // on permet de le reprendre comme nouvelle valeur de Z1.
     if (z3 && !touched) {
@@ -141,8 +156,22 @@ function onScreenClick() {
     }
 }
 
-/* ── Saisie numérique (écrit dans l'état interne) ── */
+/* ── Saisie numérique (écrit dans l'état interne, ou dans l'exposant) ── */
 function kN(v) {
+    // ── Mode saisie de l'exposant pour Zⁿ ──
+    if (waitingForExp) {
+        if (v === 'neg') {
+            expStr = expStr.startsWith('-') ? expStr.slice(1) : '-' + expStr;
+        } else if (v === '.') {
+            return; // exposant entier uniquement, on ignore le point
+        } else {
+            expStr = (expStr === '0' || expStr === '') ? v : expStr + v;
+        }
+        scr(expStr || '0', "Appuyez sur = pour calculer Zⁿ", `Zⁿ — n = ${expStr || '?'}`);
+        return;
+    }
+
+    // ── Saisie normale de Z1 / Z2 ──
     let cur = getActiveValue();
 
     // Si on vient de cliquer sur le résultat pour l'éditer, le premier
@@ -168,6 +197,14 @@ function kN(v) {
 }
 
 function kDel() {
+    // ── Mode saisie de l'exposant ──
+    if (waitingForExp) {
+        expStr = expStr.slice(0, -1);
+        scr(expStr || '0', "Appuyez sur = pour calculer Zⁿ", `Zⁿ — n = ${expStr || '?'}`);
+        return;
+    }
+
+    // ── Suppression normale ──
     let cur = getActiveValue();
     cur = cur.slice(0, -1);
     if (cur === '' || cur === '-') cur = '0';
@@ -178,6 +215,8 @@ function kDel() {
 }
 
 function kClear() {
+    waitingForExp = false;
+    expStr = '';
     state.z1.re = '0'; state.z1.im = '0';
     state.z2.re = '0'; state.z2.im = '0';
     scr('0'); curOp = null; z3 = null;
@@ -187,8 +226,22 @@ function kClear() {
     updateZIndicator();
 }
 
+/* ── Touche Zⁿ : démarre le mode saisie d'exposant ──────────────────
+   L'exposant se tape ensuite normalement au pavé numérique (kN),
+   et "=" (kEqual) valide et calcule — sans aucune fenêtre prompt(). */
+function kPow() {
+    if (!touched && !z3) {
+        scr('Saisissez Z₁ d\'abord', '→ utilisez le pavé numérique', 'Aucune valeur', true);
+        return;
+    }
+    waitingForExp = true;
+    expStr = '';
+    scr('0', "Saisissez l'exposant n puis appuyez sur =", 'Zⁿ — entrez n :');
+}
+
 /* ── Fonctions unaires (s'appliquent à Z₃ si dispo, sinon Z₁) ── */
 function kFn(fn) {
+    if (waitingForExp) return; // pas de fonctions pendant la saisie d'un exposant
     if (fn === 're') { kRe(); return; }
     if (fn === 'im') { kIm(); return; }
 
@@ -223,6 +276,7 @@ function kFn(fn) {
 
 /* ── Opérateurs binaires ── */
 function kOp(o) {
+    if (waitingForExp) return;
     if (mode !== 'b') {
         scr('Passez en mode BINAIRE', '← bouton "Binaire"', 'Opération impossible', true);
         return;
@@ -238,6 +292,22 @@ function kOp(o) {
 }
 
 function kEqual() {
+    // ── Mode saisie exposant : "=" valide n et calcule Zⁿ ──
+    if (waitingForExp) {
+        const n = parseInt(expStr, 10);
+        waitingForExp = false;
+        expStr = '';
+        if (isNaN(n)) {
+            scr('Exposant invalide', '→ entrez un entier', 'Zⁿ', true);
+            return;
+        }
+        const z = z3 || z1();
+        const result = Cx.pow(z, n);
+        showZ(result, `(${fz(z)})^${n}`);
+        return;
+    }
+
+    // ── Calcul normal (unaire ou binaire) ──
     if (!touched && !z3) {
         scr('Aucune saisie', '→ entrez un nombre avant de calculer', 'En attente', true);
         return;
@@ -246,7 +316,9 @@ function kEqual() {
     const za = z1(), zb = z2();
 
     if (!curOp && mode === 'u') {
-        scr(fz(za), fp(za), 'Z₁'); return;
+        scr(fz(za), fp(za), 'Z₁');
+        if (typeof drawPlane === 'function') drawPlane(za, z3);
+        return;
     }
 
     if (mode === 'b' && !curOp) {
@@ -277,6 +349,7 @@ function kEqual() {
 }
 
 function kSwap() {
+    if (waitingForExp) return;
     const a1 = state.z1.re, b1 = state.z1.im;
     state.z1.re = state.z2.re; state.z1.im = state.z2.im;
     state.z2.re = a1;          state.z2.im = b1;
@@ -303,7 +376,7 @@ function showRepere() {
     hideAllViews();
     $('viewRepere').classList.remove('sc-view-hidden');
     $('scBackBtn').classList.add('show');
-    drawPlane(z1(), z3);
+    if (typeof drawPlane === 'function') drawPlane(z1(), z3);
 }
 function showHist() {
     hideAllViews();

@@ -140,11 +140,11 @@ $historiques = historique_liste(20);
         <button class="key key-num" onclick="kN('0')"><div class="kf"><span class="kl">0</span></div></button>
         <button class="key key-num" onclick="kN('.')"><div class="kf"><span class="kl">.</span></div></button>
         <button class="key key-num" onclick="kN('neg')"><div class="kf"><span class="kl">±</span></div></button>
-        
+        <button class="key key-fn" onclick="kPow()">
+        <div class="kf"><span class="kl">zⁿ</span><span class="ks">PUISS. n</span></div>
+        </button>
         <button class="key key-eq" onclick="kEqual()"><div class="kf"><span class="kl">=</span></div></button>
-    
         
-      
       </div>
 
     </div>

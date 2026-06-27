@@ -182,10 +182,26 @@ body{
 .key-red:hover{background:linear-gradient(180deg,#b91c1c,#991b1b);}
 .key-red:active{box-shadow:0 1px 0 #4c0f0f;}
 
-.key-eq{background:linear-gradient(180deg,#16a34a,#0f7a38);box-shadow:0 4px 0 #064220,0 1px 0 rgba(255,255,255,0.15);color:#fff;grid-column:span 2;}
-.key-eq .kl{font-size:22px;}
-.key-eq:hover{background:linear-gradient(180deg,#1dbd57,#16a34a);}
-.key-eq:active{box-shadow:0 1px 0 #064220;}
+.key-eq {
+  background: linear-gradient(180deg, #16a34a, #0f7a38);
+  box-shadow: 0 4px 0 #064220, 0 1px 0 rgba(255,255,255,0.15);
+  color: #fff;
+  grid-column: 1 / 5;        /* ← occupe les 4 colonnes */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.key-eq .kl {
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.key-eq:hover { background: linear-gradient(180deg, #1dbd57, #16a34a); }
+.key-eq:active { box-shadow: 0 1px 0 #064220; }
+
 
 /* (le panneau "Saisie directe" avec <input> a été supprimé :
    toute saisie passe désormais par le pavé numérique et le clic
